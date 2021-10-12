@@ -1,0 +1,11 @@
+Django==3.2.4 # https://pypi.org/project/Django/
+django-environ==0.6.0 # https://pypi.org/project/django-environ/
+django-cors-headers==3.8.0 # https://pypi.org/project/django-cors-headers/
+cloudinary==1.26.0 # https://pypi.org/project/cloudinary/
+django-cloudinary-storage==0.3.0 # https://pypi.org/project/django-cloudinary-storage/
+bleach==4.1.0 # https://pypi.org/project/bleach/
+django-bleach==0.7.2 # https://pypi.org/project/django-bleach/
+djangorestframework==3.12.4 # https://pypi.org/project/djangorestframework/
+djangorestframework-simplejwt==4.8.0 # https://pypi.org/project/djangorestframework-simplejwt/
+psycopg2-binary==2.9.1 # https://pypi.org/project/psycopg2-binary/
+argon2-cffi==21.1.0 # https://pypi.org/project/argon2-cffi/

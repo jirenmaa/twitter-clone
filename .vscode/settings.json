@@ -1,0 +1,3 @@
+{
+    "python.defaultInterpreterPath": "${workspaceRoot}/env/bin/python"
+}

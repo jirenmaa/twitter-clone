@@ -1,0 +1,8 @@
+{
+  "name": "twitter-clone",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "web-dev": "cd web && yarn serve"
+  }
+}
