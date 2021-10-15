@@ -36,6 +36,8 @@ MIGRATION_MODULES = {
     "users": "database.migrations.v1.users",
     "actions": "database.migrations.v1.actions"
 }
+# https://docs.djangoproject.com/en/3.2/ref/settings/#conn-max-age
+CONN_MAX_AGE = 60 * 5
 
 
 # URLS
