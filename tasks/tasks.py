@@ -4,7 +4,7 @@ import os
 
 from celery import Celery
 from celery.utils.log import get_task_logger
-from modules.utils.mails import activate_email_account
+from modules.utils.mails import activate_email_account, reset_password_account
 
 logger = get_task_logger(__name__)
 
@@ -30,3 +30,10 @@ def send_mail_queue(scheme, host, recepients, message):
     Send email to user
     """
     activate_email_account(scheme, host, recepients, message)
+
+@app.task(name="send_reset_password_mail")
+def send_reset_password_mail(scheme,host, recepients, message):
+    """
+    Send email to user
+    """
+    reset_password_account(scheme, host, recepients, message)
