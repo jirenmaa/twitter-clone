@@ -1,6 +1,7 @@
 import binascii
 import hashlib
 import hmac
+from datetime import datetime
 from urllib.parse import quote_plus
 
 from django.conf import settings
@@ -13,7 +14,7 @@ def create_sha256_signature(user):
     user = user.encode()
 
     # Create bytes from the secret key
-    byte_key = bytes(settings.SECRET_KEY, "UTF-8")
+    byte_key = bytes(settings.SECRET_KEY + str(datetime.today().timestamp()), "UTF-8")
 
     # Create the signature using HMAC-SHA256
     signature = hmac.new(byte_key, user, hashlib.sha256)

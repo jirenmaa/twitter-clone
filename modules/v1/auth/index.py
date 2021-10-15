@@ -6,12 +6,13 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 from tasks import tasks
-from modules.utils.url_signature import create_sha256_signature
+from modules.utils.signature import create_sha256_signature
 from modules.v1.users.models import User
 from modules.v1.users.serializers import (
-    UserRestActivationSerializer,
+    UserResetActivationSerializer,
     UserSerializer,
     UserTokenObtainPairSerializer,
+    UserForgotPasswordSerializer,
 )
 
 from rest_framework import generics, status
@@ -43,9 +44,7 @@ class AuthRegisterAPIView(generics.CreateAPIView):
         return str(user.id)
 
     def post(self, request, *args, **kwargs):
-        """
-        Create user
-        """
+        """Create new user"""
         try:
             # validate data from request
             serializer = self.get_serializer(data=request.data)
@@ -82,9 +81,7 @@ class AuthActivateAPIView(generics.GenericAPIView):
     """User activation view"""
 
     def get(self, request, *args, **kwargs):
-        """
-        Activate user
-        """
+        """Activate user"""
         try:
             # get url signature from request
             # escape key that it can contain special characters
@@ -122,12 +119,10 @@ activate = AuthActivateAPIView.as_view()
 class AuthResetActivationAPIView(generics.GenericAPIView):
     """User reset activation url view"""
 
-    serializer_class = UserRestActivationSerializer
+    serializer_class = UserResetActivationSerializer
 
     def get(self, request, *args, **kwargs):
-        """
-        Reset user activation
-        """
+        """Reset user activation"""
         try:
             # validate data from request
             serializer = self.get_serializer(data=request.data)
@@ -159,6 +154,78 @@ class AuthResetActivationAPIView(generics.GenericAPIView):
 
 
 reset_activation = AuthResetActivationAPIView.as_view()
+
+
+class AuthForgotPasswordAPIView(generics.GenericAPIView):
+    """User forgot password view"""
+
+    serializer_class = UserForgotPasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        """User get url to reset their password"""
+        try:
+            # validate data from request
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            # get user, and because the serializer is not saved
+            # so it use the inital_data from serializer instead of validated_data
+            user = get_object_or_404(User, email=serializer.initial_data["email"])
+            # generate url signature
+            url_signature = create_sha256_signature(str(user.id))
+            # send reset password email
+            tasks.send_reset_password_mail.apply_async(
+                args=[
+                    request.scheme,
+                    request.get_host(),
+                    serializer.initial_data["email"],
+                    url_signature,
+                ]
+            )
+
+            # url signature for forgot password is stored in redis for 5 minutes
+            # and deleted after changing the password or expiration
+            redis_client.set(url_signature, str(user.id), timedelta(minutes=5))
+
+            return JsonResponse(
+                {"msg": "Reset password is sent"}, status=status.HTTP_200_OK
+            )
+        except Exception as ex:
+            return JsonResponse({"msg": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        """Reset user password"""
+        try:
+            # get url signature from request
+            # escape key that it can contain special characters
+            # because it is used as key in redis
+            key = quote_plus(request.GET.get("key"))
+            # get user id from url signature
+            user_id = redis_client.get(key)
+            # if user id is not found in redis
+            # it means that user is already activated or maybe expired
+            if user_id is None:
+                return JsonResponse(
+                    {"msg": "User is not found or activation link expired"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # get user object or raise 404 if user is not found
+            queryset = get_object_or_404(User, id=user_id)
+            # serialized user queryset
+            serializer = UserForgotPasswordSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            # update user password with serialized data
+            queryset.set_password(serializer.initial_data.get("password"))
+            queryset.save()
+
+            return JsonResponse(
+                {"msg": "Your password has been changed"}, status=status.HTTP_200_OK
+            )
+        except Exception as ex:
+            return JsonResponse({"msg": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+forgot_password = AuthForgotPasswordAPIView.as_view()
 
 
 class AuthLogin(TokenObtainPairView):

@@ -21,10 +21,17 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserRestActivationSerializer(serializers.Serializer):
+class UserResetActivationSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = "email"
+
+
+class UserForgotPasswordSerializer(serializers.Serializer):
+    class Meta:
+        model = User
+        fields = "password"
+        read_only_fields = ["email"]
 
 
 class UserTokenObtainPairSerializer(TokenObtainPairSerializer):

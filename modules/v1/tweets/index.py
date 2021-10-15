@@ -10,8 +10,9 @@ from modules.v1.users.models import User
 
 from .models import Tweet, ResponseComment
 from .serializers import (
-    TweetPostSerializer,
     TweetSerializer,
+    TweetDetailSerializer,
+    TweetPostSerializer,
     TweetResponseCommentSerializer,
 )
 
@@ -89,7 +90,7 @@ class TweetDetailAPIView(BaseTweetAPIView):
         Bearer Token
     """
 
-    serializer_class = TweetSerializer
+    serializer_class = TweetDetailSerializer
 
     def get(self, request, id: str, *args, **kwargs):
         try:
