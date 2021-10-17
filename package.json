@@ -3,6 +3,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "web-dev": "cd web && yarn serve"
+    "dev": "cd web && yarn serve"
+  },
+  "dependencies": {
+    "autoprefixer": "^9",
+    "axios": "^0.23.0",
+    "eslint-config-standard": "^16.0.3",
+    "postcss": "^7",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
   }
 }

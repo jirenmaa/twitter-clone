@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "types": [
-      "webpack-env"
+      "webpack-env",
     ],
     "baseUrl": ".",
     "paths": {
@@ -35,5 +35,5 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

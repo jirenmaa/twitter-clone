@@ -1,32 +1,50 @@
+<script lang="ts">
+import { defineComponent } from 'vue'
+import LeftSidebar from './components/shared/LeftSidebar.vue'
+
+export default defineComponent({
+  name: 'App',
+  components: {
+    LeftSidebar
+  }
+})
+</script>
+
 <template>
-  <div>
-    <div id="nav">
-      <router-link to="/">Home</router-link>|
-      <router-link to="/about">About</router-link>
-    </div>
+  <div class="grid grid-cols-5 h-screen">
+    <LeftSidebar class="col-span-1 border-r border-dark-grey h-full" />
     <router-view></router-view>
   </div>
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  font-weight: 300;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+  outline: none !important;
 }
 
-#nav {
-  padding: 30px;
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd #222;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+html::-webkit-scrollbar {
+  width: 5px !important;
+  background: #222;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+html::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border: 3px solid #ddd;
+}
+
+body {
+  color: #ccc;
+  background: #131313;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>
