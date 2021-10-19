@@ -1,13 +1,4 @@
 -r base.txt
 
-# styling & formatting
-click>=7.1.2
-platformdirs>=2
-tomli==1.2.1
-typed-ast>=1.4.1
-git+https://bitbucket.org/mrabarnett/mrab-regex.git
-pathspec>=0.9.0
-dataclasses>=0.6
-typing_extensions>=3.10.0.0
-mypy_extensions>=0.4.3
-black==21.9b0
+black==21.9b0 # https://pypi.org/project/black/
+cookiecutter==1.7.3 # https://pypi.org/project/cookiecutter/
