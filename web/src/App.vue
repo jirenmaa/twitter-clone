@@ -47,4 +47,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.on-hover {
+  &:hover {
+    .hovered {
+      text-decoration: underline;
+    }
+  }
+}
 </style>

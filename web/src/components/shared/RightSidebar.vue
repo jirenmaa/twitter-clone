@@ -71,13 +71,3 @@ export default defineComponent({
     </div>
   </div>
 </template>
-
-<style lang="scss">
-.on-hover {
-  &:hover {
-    .hovered {
-      text-decoration: underline;
-    }
-  }
-}
-</style>

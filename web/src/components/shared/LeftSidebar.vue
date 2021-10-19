@@ -21,20 +21,33 @@ export default defineComponent({
 <template>
   <div class="flex flex-col space-y-2 text-3xl pt-8">
     <div class="flex flex-col space-y-2 sticky top-8 mx-8">
-      <div class="w-24 h-24 bg-dark border border-dark-grey rounded-full mx-auto"></div>
+      <div
+        class="w-24 h-24 bg-dark border border-dark-grey rounded-full cursor-pointer mx-auto"
+        @click="$router.push('/matt_dreaming')"
+      ></div>
       <div class="items-center text-center">
-        <div class="font-medium text-2xl">Matt Dreamson</div>
         <div
-          class="lowercase text-peach text-mm"
-        >A Fool and His Money Are Soon Parted wadasdaw da sdaw da sad awd</div>
+          class="font-medium text-2xl cursor-pointer"
+          @click="$router.push('/matt_dreaming')"
+        >
+          Matt Dreamson
+        </div>
+        <div class="lowercase text-peach text-mm">
+          A Fool and His Money Are Soon Parted wadasdaw da sdaw da sad awd
+        </div>
       </div>
       <div class="text-base pt-12">
         <span class="uppercase font-medium">menus</span>
-        <div v-for="(navigation, index) in navigations" :key="index" class="mt-3">
+        <div
+          v-for="(navigation, index) in navigations"
+          :key="index"
+          class="mt-3"
+        >
           <router-link
             :to="navigation[1]"
             class="capitalize text-peach hover:text-current hover:underline"
-          >{{ navigation[0] }}</router-link>
+            >{{ navigation[0] }}</router-link
+          >
         </div>
       </div>
       <div class="text-base pt-6">
@@ -43,7 +56,8 @@ export default defineComponent({
           <router-link
             to="/"
             class="capitalize text-peach hover:text-current hover:underline hover:text-red-500"
-          >logout</router-link>
+            >logout</router-link
+          >
         </div>
       </div>
     </div>

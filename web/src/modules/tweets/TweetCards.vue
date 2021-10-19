@@ -9,9 +9,27 @@ export default defineComponent({
   },
   setup () {
     // eslint-disable-next-line
-    function redirect (this: any, url: string) {
-      console.log(this.$router)
-      this.$router.push({ name: url })
+    function stopEvent(event: any) {
+      // stop any default behavior of the event
+      event.cancelBubble = true
+      if (event.stopPropagation) {
+        event.stopPropagation()
+        event.preventDefault()
+      }
+    }
+
+    // eslint-disable-next-line
+    function redirect(this: any, event: any, url: string, parameters: any) {
+      // redirect to the url with the given parameters
+      const target = event.currentTarget.attributes['data-event']
+      const routed = { name: url, params: parameters }
+
+      if (target) {
+        this.$router.push(routed)
+        stopEvent(event)
+      } else {
+        this.$router.push(routed)
+      }
     }
 
     return {
@@ -24,13 +42,20 @@ export default defineComponent({
 <template>
   <div class="flex flex-col space-y-4">
     <!-- simple tweet -->
-    <div class="grid grid-cols-12 border border-dark-grey rounded p-4" @click="redirect('tweet-detail')">
+    <div
+      class="grid grid-cols-12 border border-dark-grey rounded p-4"
+      @click="redirect($event, 'tweet-detail', { username: 'matt_dreaming', id: '1' })"
+    >
       <div class="col-span-1 mx-auto">
         <div class="w-10 h-10 bg-dark border border-dark-grey rounded-full"></div>
       </div>
       <div class="col-span-11 ml-4">
-        <div class="flex items-center space-x-2">
-          <div class="font-medium text-lg">Matt Dreamson</div>
+        <div
+          class="inline-flex items-center cursor-pointer space-x-2 on-hover"
+          @click="redirect($event, 'user-profile', { username: 'matt_dreaming' })"
+          data-event="user-profile"
+        >
+          <div class="font-medium text-lg hovered">Matt Dreamson</div>
           <span class="text-peach text-sm">@matt_dreaming</span>
         </div>
         <div
