@@ -1,0 +1,13 @@
+POSTGRES_ENGINE=django.db.backends.postgresql_psycopg2
+POSTGRES_DB=twitter-clone
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+REPLICA_ENGINE=django.db.backends.postgresql_psycopg2
+REPLICA_DB=twitter-clone-replica
+REPLICA_USER=user
+REPLICA_PASSWORD=password
+REPLICA_HOST=localhost
+REPLICA_PORT=5432
