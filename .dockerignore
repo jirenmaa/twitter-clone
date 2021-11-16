@@ -1,0 +1,5 @@
+.vscode/
+
+git-images/
+venv/
+node_modules/

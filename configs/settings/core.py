@@ -7,7 +7,13 @@ import dotenv
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 # read environment variables from .env
-dotenv.read_dotenv(dotenv=os.path.join(BASE_DIR, "app-config/.env"))
+dotenv.read_dotenv(dotenv=os.path.join(BASE_DIR, ".envs/django/.django"))
+dotenv.read_dotenv(dotenv=os.path.join(BASE_DIR, ".envs/postgres/.postgres"))
+
+WEBSITE_URL = os.getenv("WEBSITE_URL")
+
+DATABASE_HOST = os.getenv("POSTGRES_DOCKER_HOST")
+DATABASE_HOST = DATABASE_HOST if DATABASE_HOST else os.getenv("POSTGRES_HOST")
 
 DJANGO_DEFAULT_URL = os.getenv("DJANGO_DEFAULT_URL", "localhost:8000/")
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -32,9 +38,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
 # https://docs.djangoproject.com/en/3.2/ref/settings/#migration-modules
 MIGRATION_MODULES = {
-    "tweets": "database.migrations.v1.tweets",
-    "users": "database.migrations.v1.users",
-    "actions": "database.migrations.v1.actions"
+    "tweets": "database.migrations.tweets",
+    "users": "database.migrations.users",
+    "actions": "database.migrations.actions",
 }
 # https://docs.djangoproject.com/en/3.2/ref/settings/#conn-max-age
 CONN_MAX_AGE = 60 * 5
@@ -76,9 +82,9 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt.token_blacklist",
 ]
 LOCAL_APPS = [
-    "modules.v1.auth.apps.AuthenticationConfig",
-    "modules.v1.users.apps.UsersConfig",
-    "modules.v1.tweets.apps.TweetsConfig",
+    "modules.auth.apps.AuthenticationConfig",
+    "modules.users.apps.UsersConfig",
+    "modules.tweets.apps.TweetsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -89,20 +95,20 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DATABASE_ENGINE"),
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DATABASE_HOST"),
-        "PORT": os.getenv("DATABASE_PORT"),
+        "ENGINE": os.getenv("POSTGRES_ENGINE"),
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": DATABASE_HOST,
+        "PORT": os.getenv("POSTGRES_PORT"),
     },
     "replica": {
-        "ENGINE": os.getenv("REPLICA_DB_ENGINE"),
-        "NAME": os.getenv("REPLICA_DB_NAME"),
-        "USER": os.getenv("REPLICA_DB_USER"),
-        "PASSWORD": os.getenv("REPLICA_DB_PASSWORD"),
-        "HOST": os.getenv("REPLICA_DB_HOST"),
-        "PORT": os.getenv("REPLICA_DB_PORT"),
+        "ENGINE": os.getenv("REPLICA_ENGINE"),
+        "NAME": os.getenv("REPLICA_NAME"),
+        "USER": os.getenv("REPLICA_USER"),
+        "PASSWORD": os.getenv("REPLICA_PASSWORD"),
+        "HOST": DATABASE_HOST,
+        "PORT": os.getenv("REPLICA_PORT"),
         "TEST": {
             "MIRROR": "default",
         },
@@ -157,8 +163,8 @@ AUTH_PASSWORD_VALIDATORS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -175,7 +181,8 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         "DIRS": [
-            os.path.join(BASE_DIR, "modules/templates"),
+            os.path.join(BASE_DIR, "modules", "templates"),
+            os.path.join(BASE_DIR, "celeryapp", "workers", "templates"),
         ],
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -234,7 +241,7 @@ EMAIL_PORT = 587
 # https://docs.djangoproject.com/en/3.2/ref/settings/#email-use-tls
 EMAIL_USE_TLS = True
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = "Tweatter <noreply@tweatter.herokuapp>"
+DEFAULT_FROM_EMAIL = "twitter-clone <noreply@twitter-clone.com>"
 
 
 # JWT
@@ -269,11 +276,20 @@ SIMPLE_JWT = {
 # Celery
 # ------------------------------------------------------------------------------
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#broker-transport
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = "Asia/Bangkok"
+CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "Asia/Bangkok")
 CELERY_ENABLE_UTC = True
 CELERY_RESULT_EXPIRES = timedelta(seconds=10)
+
+# REDIS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/3.2/ref/settings/#redis-host
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+# https://docs.djangoproject.com/en/3.2/ref/settings/#redis-port
+REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+# https://docs.djangoproject.com/en/3.2/ref/settings/#redis-db
+REDIS_DB = os.getenv("REDIS_DB", 0)

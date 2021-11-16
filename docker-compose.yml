@@ -1,0 +1,93 @@
+version: '3'
+
+networks:
+  application:
+    driver: bridge
+
+volumes:
+  local_postgres_data: {}
+  local_backend_data: {}
+
+services:
+  service-database:
+    image: postgres:12.9
+    container_name: service-database
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: twitter-clone
+      POSTGRES_HOST: service-database
+    networks:
+      - application
+    ports:
+      - 5432:5432
+    restart: always
+
+  service-backend:
+    build:
+      context: .
+      dockerfile: ./compose/backend/Dockerfile
+    container_name: service-backend
+    volumes:
+      - local_backend_data:/usr/src/backend:z
+    command:
+      - /usr/src/backend/compose/backend/runserver
+    env_file:
+      - ./.envs/django/.django
+      - ./.envs/postgres/.postgres
+    environment:
+      POSTGRES_DOCKER_HOST: service-database
+      REDIS_HOST: worker-redis
+      CELERY_BROKER_URL: redis://worker-redis:6379/0
+      CELERY_RESULT_BACKEND: redis://worker-redis:6379/0
+    networks:
+      - application
+    ports:
+      - 8000:8000
+    depends_on:
+      - service-database
+      - worker-redis
+      - worker-celery
+    restart: always
+
+  service-frontend:
+    build:
+      context: .
+      dockerfile: ./compose/frontend/Dockerfile
+    container_name: service-frontend
+    networks:
+      - application
+    ports:
+      - 8080:8080
+    depends_on:
+      - service-database
+      - service-backend
+    restart: unless-stopped
+
+  worker-redis:
+    image: redis:6
+    container_name: service-redis
+    networks:
+      - application
+
+  worker-celery:
+    build:
+      context: .
+      dockerfile: ./compose/celeryapp/Dockerfile
+    container_name: worker-celery
+    command: celery -A celeryapp.tasks worker -l info
+    env_file:
+      - ./.envs/django/.django
+      - ./.envs/postgres/.postgres
+    environment:
+      CELERY_TIMEZONE: UTC
+      CELERY_BROKER_URL: redis://worker-redis:6379/0
+      CELERY_RESULT_BACKEND: redis://worker-redis:6379/0
+    networks:
+      - application
+    depends_on:
+      - worker-redis
+      - service-database
+    restart: always

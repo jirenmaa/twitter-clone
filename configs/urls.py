@@ -3,8 +3,8 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path("auth/", include("modules.v1.auth.routes")),
-    path("user/", include("modules.v1.users.routes")),
+    path("auth/", include("modules.auth.routes")),
 
-    path("tweets/", include("modules.v1.tweets.routes")),
+    path("tweets/", include("modules.tweets.routes")),
+    path("user/", include("modules.users.routes")),
 ]
