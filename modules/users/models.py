@@ -35,7 +35,7 @@ class User(AbstractUser):
         max_length=15,
         unique=True,
         help_text=_(
-            "Required. 15 characters or fewer. Letters, digits and @/./+/-/_ only."
+            "Required. 15 characters or fewer. Letters, digits and /-/_ only."
         ),
         validators=[username_validator],
         error_messages={

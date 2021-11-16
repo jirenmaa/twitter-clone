@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ActionsConfig(AppConfig):
+class UsersConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'modules.v1.actions'
+    name = 'modules.users'

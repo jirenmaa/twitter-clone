@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_bleach.models import BleachField
 
-from modules.v1.users.models import User
+from modules.users.models import User
 
 
 def tweet_tags_validator(value):
@@ -53,7 +53,7 @@ class Tweet(models.Model):
 class ResponseLike(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     tweet = models.OneToOneField(Tweet, related_name="likes", on_delete=models.CASCADE)
-    user = models.ManyToManyField(User, related_name="liked_tweets")
+    user = models.ManyToManyField(User, related_name="likes_users")
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
@@ -64,14 +64,25 @@ class ResponseLike(models.Model):
 class ResponseComment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     tweet = models.ForeignKey(Tweet, related_name="comments", on_delete=models.CASCADE)
-    user = models.ForeignKey(
+    author = models.ForeignKey(
         User, null=True, related_name="commented_tweets", on_delete=models.CASCADE
     )
+    pictures = models.ImageField(upload_to="pictures/", blank=True, null=True)
     content = models.TextField(
         _("comment content"),
         max_length=264,
         help_text=_("264 characters maximal or fewer"),
     )
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return str(self.id)
+
+class ResponseUserLikedTweet(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name="liked_tweet", on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
