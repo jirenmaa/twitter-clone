@@ -13,3 +13,11 @@ class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ("name", "username", "avatar", "email", "password")
+
+
+class UserPublicInfoSerializer(serializers.ModelSerializer):
+    """serializer for default user info serializer"""
+
+    class Meta:
+        model = UserModel
+        fields = ("name", "username", "avatar")

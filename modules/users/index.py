@@ -2,11 +2,12 @@ from typing import List
 
 from django.http import JsonResponse
 
-from modules.tweets.models import Tweet
+from modules.tweets.models import Tweet, ResponseUserLikedTweet
 from modules.tweets.serializers import (
     TweetPublicSerializer,
     UserTweetPublicLikesSerializer,
 )
+from modules.users.serializers import UserPublicInfoSerializer
 from modules.users.models import User
 
 from rest_framework import generics, status
@@ -23,13 +24,12 @@ class UserBaseApi(generics.GenericAPIView):
     def get_queryset(self) -> User:
         pass
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, username: str, *args, **kwargs):
         """return list of user tweet with pagination"""
         try:
-            performer = self.retrive_token(request).payload.get("user_id")
             # serialize data from database and paginate
             # by default, paginate by 10
-            queryset = self.filter_queryset(self.get_queryset(performer))
+            queryset = self.filter_queryset(self.get_queryset(username))
             serializer = self.get_serializer(queryset, many=True)
 
             return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -43,6 +43,25 @@ class UserBaseApi(generics.GenericAPIView):
         return access
 
 
+class UserPublicInfoVuew(UserBaseApi):
+    """view for user public info"""
+
+    serializer_class = UserPublicInfoSerializer
+
+    def get_queryset(self, username: str) -> User:
+        """get user querset"""
+        return User.objects.get(username=username, is_active=True)
+
+    def get(self, request, username: str, *args, **kwargs):
+        """get user public info"""
+        try:
+            queryset = self.get_queryset(username)
+            serializer = self.get_serializer(queryset)
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        except Exception as ex:
+            return JsonResponse({"detail": ex.args}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserPublicTweetView(UserBaseApi):
     """user public tweet api views
     methods: get, delete
@@ -50,13 +69,17 @@ class UserPublicTweetView(UserBaseApi):
 
     serializer_class = TweetPublicSerializer
 
-    def get_queryset(self, id) -> List[Tweet]:
+    def get_queryset(self, username: str) -> List[Tweet]:
         """return list of user tweet"""
-        return User.objects.get(pk=id).tweets.all().order_by("-created_at")
+        return (
+            User.objects.get(username=username, is_active=True)
+            .tweets.all()
+            .order_by("-created_at")
+        )
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, username: str, *args, **kwargs):
         """return list of user tweeted tweets"""
-        return self.list(request, *args, **kwargs)
+        return self.list(request, username, *args, **kwargs)
 
 
 class UserPublicMediaView(UserBaseApi):
@@ -66,18 +89,18 @@ class UserPublicMediaView(UserBaseApi):
 
     serializer_class = TweetPublicSerializer
 
-    def get_queryset(self, id) -> List[Tweet]:
+    def get_queryset(self, username: str) -> List[Tweet]:
         """return list of user tweet"""
         return (
-            User.objects.get(pk=id)
+            User.objects.get(username=username, is_active=True)
             .tweets.all()
             .exclude(pictures="")
             .order_by("-created_at")
         )
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, username: str, *args, **kwargs):
         """return list of user tweeted medias"""
-        return self.list(request, *args, **kwargs)
+        return self.list(request, username, *args, **kwargs)
 
 
 class UserPublicReplyView(UserBaseApi):
@@ -87,13 +110,17 @@ class UserPublicReplyView(UserBaseApi):
 
     serializer_class = TweetPublicSerializer
 
-    def get_queryset(self, id) -> List[Tweet]:
+    def get_queryset(self, username: str) -> List[Tweet]:
         """return list of user tweet"""
-        return User.objects.get(pk=id).commented_tweets.all()
+        return (
+            User.objects.get(username=username, is_active=True)
+            .commented_tweets.all()
+            .order_by("-created_at")
+        )
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, username: str, *args, **kwargs):
         """return list of user tweeted replies"""
-        return self.list(request, *args, **kwargs)
+        return self.list(request, username, *args, **kwargs)
 
 
 class UserPublicLikesView(UserBaseApi):
@@ -103,15 +130,20 @@ class UserPublicLikesView(UserBaseApi):
 
     serializer_class = UserTweetPublicLikesSerializer
 
-    def get_queryset(self, id) -> List[Tweet]:
+    def get_queryset(self, username: str) -> List[ResponseUserLikedTweet]:
         """return list of user tweet"""
-        return User.objects.get(pk=id).liked_tweet.all().order_by("-created_at")
+        return (
+            User.objects.get(username=username, is_active=True)
+            .liked_tweet.all()
+            .order_by("-created_at")
+        )
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, username: str, *args, **kwargs):
         """return list of user tweeted replies"""
-        return self.list(request, *args, **kwargs)
+        return self.list(request, username, *args, **kwargs)
 
 
+user_info = UserPublicInfoVuew.as_view()
 user_tweets = UserPublicTweetView.as_view()
 user_medias = UserPublicMediaView.as_view()
 user_replies = UserPublicReplyView.as_view()
