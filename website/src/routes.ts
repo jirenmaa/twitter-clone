@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import store from '@/store'
 
-import homeRoutes from './modules/home/routes'
+import homeRoutes from '@/modules/home/routes'
 import authRoutes from '@/modules/auth/routes'
 import userRoutes from '@/modules/user/routes'
 
@@ -16,7 +16,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   const authenticated = store.getters.getIsAuthenticated
   const requiredLogin = to.matched.some(record => record.meta.requiresAuth)
   const alreadyLogged = to.matched.some(record => record.meta.authenticated)

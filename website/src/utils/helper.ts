@@ -3,8 +3,7 @@ import router from '@/routes'
 /**
  * stop any default behavior of event
  */
-// eslint-disable-next-line
-export function stopEvent (event: any): void {
+export function stopEvent (event: Event): void {
   event.cancelBubble = true
   if (event.stopPropagation) {
     event.stopPropagation()
