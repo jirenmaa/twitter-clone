@@ -29,9 +29,7 @@ const StoreTweetReply: StoreOptions<any> = {
       state.tweetId = tweetId
     },
     setAuthor (state: StoreTweetReply, author: TweetAuthor): void {
-      console.log('in state before', author)
       state.author = author
-      console.log('in state afters', author)
     },
     setContent (state: StoreTweetReply, content: string): void {
       state.content = content

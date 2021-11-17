@@ -10,11 +10,11 @@ export async function logout (): Promise<void> {
       refresh: refresh
     })
 
-    await store.commit('resetState')
-    await localStorage.removeItem('storage')
+    await store.commit('setUserResetState')
+    await sessionStorage.removeItem('storage')
     router.push({ name: 'login' })
   } catch (error: any) {
-    return error.response.data.detail
+    console.error(error.response.data.detail)
   }
 }
 

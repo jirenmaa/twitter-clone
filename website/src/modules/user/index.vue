@@ -23,7 +23,7 @@ export default defineComponent({
 
 <template>
   <div class="grid grid-cols-5 h-screen">
-    <LeftSidebar class="col-span-1 border-r border-dark-grey h-full" :userData="user" />
+    <LeftSidebar class="col-span-1 border-r border-dark-grey h-full" :userInfo="user" />
     <div class="grid grid-cols-5 col-span-4">
       <div class="col-span-3 flex flex-col ml-12 mb-12">
         <UserInfo :userInfo="user" />

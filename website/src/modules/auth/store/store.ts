@@ -1,6 +1,18 @@
 import { StoreOptions } from 'vuex'
 import { StateUser, StateToken, StateAuthen } from '../types'
 
+const resetState = (): StateAuthen => ({
+  user: {
+    username: '',
+    avatar: ''
+  },
+  token: {
+    refresh: '',
+    access: ''
+  },
+  authenticated: false
+})
+
 const authentication: StoreOptions<any> = {
   state: () => ({
     user: null,
@@ -17,20 +29,8 @@ const authentication: StoreOptions<any> = {
     setisAuthenticated (state: StateAuthen, authenticated: boolean): void {
       state.authenticated = authenticated
     },
-    resetState (state: StateAuthen): void {
-      Object.assign(state, () => {
-        return {
-          user: {
-            username: '',
-            avatar: ''
-          },
-          token: {
-            refresh: '',
-            access: ''
-          },
-          authenticated: false
-        }
-      })
+    setUserResetState (state: StateAuthen): void {
+      Object.assign(state, resetState())
     }
   },
   getters: {
