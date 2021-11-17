@@ -1,18 +1,17 @@
 <script lang="ts">
 import { defineComponent, onBeforeMount, reactive, ref } from 'vue'
-import axiosInstance from '@/services/axios'
 import { redirect } from '@/utils/helper'
-
 import { TweetReplies } from './types'
+import { fetchTweetDiscussion } from '@/modules/tweets/services/tweets'
 
-import Responses from '@/components/Responses.vue'
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
+import Responses from '@/components/Responses.vue'
 
 export default defineComponent({
   name: 'TweetDetailDiscussion',
   components: {
-    Responses,
-    LoadingSpinner
+    LoadingSpinner,
+    Responses
   },
   props: {
     tweetId: {
@@ -22,14 +21,11 @@ export default defineComponent({
   setup (props) {
     const state = reactive({
       replies: ref<Array<TweetReplies>>([]),
-      loading: false
+      loading: true
     })
 
     onBeforeMount(async () => {
-      state.loading = true
-      await axiosInstance.get(`/tweets/replies/${props.tweetId}`).then(res => {
-        state.replies = res.data
-      })
+      state.replies = await fetchTweetDiscussion(`/tweets/replies/${props.tweetId}`)
       state.loading = false
     })
 
@@ -74,12 +70,12 @@ export default defineComponent({
             class="break-words text-ms mt-2"
           ></div>
           <div
-            class="overflow-hidden rounded-md max-h-72"
             v-if="discussion?.pictures"
+            class="overflow-hidden max-h-72 rounded-md border border-dark-grey"
           >
             <img
               alt="test tweet picture"
-              class="w-full rounded-md mt-2"
+              class="w-full rounded-md"
               :src="discussion?.pictures"
             />
           </div>

@@ -6,6 +6,7 @@ const resetState = (): StoreTweetReply => ({
   tweetId: '',
   picture: '',
   content: '',
+  success: false,
   author: {
     username: '',
     name: '',
@@ -19,7 +20,8 @@ const StoreTweetReply: StoreOptions<any> = {
     tweetId: null,
     picture: null,
     content: null,
-    author: null
+    author: null,
+    success: null
   }),
   mutations: {
     setReplying (state: StoreTweetReply, replying: boolean): void {
@@ -36,6 +38,9 @@ const StoreTweetReply: StoreOptions<any> = {
     },
     setPicture (state: StoreTweetReply, picture: string): void {
       state.picture = picture
+    },
+    setSuccess (state: StoreTweetReply, success: boolean): void {
+      state.success = success
     },
     setResetState (state: StoreTweetReply): void {
       Object.assign(state, resetState())

@@ -38,5 +38,6 @@ export type StoreTweetReply = {
   tweetId: string;
   picture: string;
   content: string;
+  success: boolean;
   author: TweetAuthor;
 }

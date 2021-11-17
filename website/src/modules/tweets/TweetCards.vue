@@ -1,17 +1,14 @@
 <script lang="ts">
-import { defineComponent, ref, watch, reactive } from 'vue'
-
-import store from '@/store'
-import { Tweet } from '@/modules/tweets/types'
+import { defineComponent, ref, reactive } from 'vue'
 import { redirect } from '@/utils/helper'
 
-import ReplyForm from '@/components/ReplyForm.vue'
+import { Tweet } from '@/modules/tweets/types'
+
 import Responses from '@/components/Responses.vue'
 
 export default defineComponent({
   name: 'TweetCards',
   components: {
-    ReplyForm,
     Responses
   },
   props: {
@@ -19,38 +16,26 @@ export default defineComponent({
   },
   setup (props) {
     const authorUsername = ref<string>(props.tweet?.author.username || '')
-    const parameter = {
-      id: props.tweet?.id,
-      username: authorUsername?.value
-    }
-    const state = reactive({
-      replying: false
-    })
-
-    watch(store.getters.getReplying, _ => {
-      state.replying = store.getters.getReplying.replying
-    })
-
-    const isResponded = (
+    const isResponded: boolean = (
       props.tweet?.responses !== undefined &&
       props.tweet?.responses.commented
     )
+    const state = reactive({
+      parameter: {
+        id: props.tweet?.id,
+        username: authorUsername?.value
+      }
+    })
 
-    return { state, redirect, authorUsername, parameter, isResponded }
+    return { state, redirect, authorUsername, isResponded }
   }
 })
 </script>
 
 <template>
   <div
-    v-if="state.replying"
-    class="fixed top-0 left-0 w-full h-screen grid place-items-center bg-dark bg-opacity-90 z-50"
-  >
-    <ReplyForm class="border bg-dark" />
-  </div>
-  <div
     class="grid grid-cols-12 cursor-pointer border border-dark-grey rounded hover:bg-dark"
-    @click="redirect($event, 'tweet-detail', parameter)"
+    @click="redirect($event, 'tweet-detail', state.parameter)"
   >
     <div class="col-span-1 relative overflow-hidden mx-auto py-4 pl-4">
       <div class="w-12 h-12 bg-dark border border-dark-grey rounded-full"></div>
@@ -64,7 +49,7 @@ export default defineComponent({
         <div
           data-event="user-profile"
           class="inline-flex items-center cursor-pointer space-x-1 on-hover"
-          @click="redirect($event, 'user-tweet', { username: authorUsername })"
+          @click="redirect($event, 'user-tweet', { username: tweet?.author.username })"
         >
           <span class="font-medium text-lg hovered">
             {{ tweet?.author.name || authorUsername }}
