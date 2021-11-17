@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
-import store from '@/store'
+import { defineComponent, watch } from 'vue'
 import { StateUser } from '@/modules/auth/types'
+import store from '@/store'
 
 import UserInfo from '@/modules/user/UserInfo.vue'
 import RightSidebar from '@/components/shared/RightSidebar.vue'
@@ -27,7 +27,7 @@ export default defineComponent({
     <div class="grid grid-cols-5 col-span-4">
       <div class="col-span-3 flex flex-col ml-12 mb-12">
         <UserInfo :userInfo="user" />
-        <router-view></router-view>
+        <router-view :key="$route.fullPath"></router-view>
       </div>
       <div class="col-span-2 mx-8 ml-16">
         <RightSidebar />

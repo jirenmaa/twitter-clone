@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, onBeforeMount } from 'vue'
+import router from '@/routes'
 
 import { Tweet } from '@/modules/tweets/types'
 import { fetchPublicTweets } from '@/modules/tweets/services/tweets'
@@ -15,13 +16,15 @@ export default defineComponent({
   },
   setup () {
     const state = reactive({
-      userReplies: ref<Array<Tweet>>([]),
-      loding: true
+      replies: ref<Array<Tweet>>([]),
+      loading: true
     })
 
     onBeforeMount(async () => {
-      state.userReplies = await fetchPublicTweets('/user/comments')
-      state.loding = false
+      const username: string = router.currentRoute.value?.params
+        ?.username as string
+      state.replies = await fetchPublicTweets(`/${username}/comments`)
+      state.loading = false
     })
 
     return { state }
@@ -30,12 +33,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <LoadingSpinner v-if="state.loding" class="grid place-items-center mt-12" />
+  <LoadingSpinner v-if="state.loading" class="grid place-items-center mt-12" />
   <div class="space-y-4 mt-12">
     <TweetCards
-      v-for="(tweet, index) in state.userReplies"
-      v-bind:key="index"
-      :tweet="tweet"
-    />
+      v-for="(tweet, index) in state.replies"
+      v-bind:key="index" :tweet="tweet" />
   </div>
 </template>

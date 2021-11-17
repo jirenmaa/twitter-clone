@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router'
 
-import UserProfile from './index.vue'
+import UserProfile from '@/modules/user/index.vue'
 import UserTweets from '@/modules/user/UserTweets.vue'
 import UserReplies from '@/modules/user/UserReplies.vue'
 import UserMedias from '@/modules/user/UserMedias.vue'
