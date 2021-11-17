@@ -6,5 +6,5 @@ urlpatterns = [
     path("auth/", include("modules.auth.routes")),
 
     path("tweets/", include("modules.tweets.routes")),
-    path("user/", include("modules.users.routes")),
+    path("<str:username>/", include("modules.users.routes")),
 ]
