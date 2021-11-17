@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, ref, onBeforeMount, reactive } from 'vue'
+import { defineComponent, ref, watch, onMounted, reactive } from 'vue'
 import axiosInstance from '@/services/axios'
 
 import store from '@/store'
-import { StateUser } from '@/modules/auth/types'
 import { TweetAuthor } from '@/modules/tweets/types'
 
 import ButtonSubmit from '@/components/shared/ButtonSubmit.vue'
@@ -17,8 +16,7 @@ export default defineComponent({
     IconImage,
     IconClose
   },
-  setup (_, { emit }) {
-    const repliedBy: StateUser = store.getters.getUser
+  setup () {
     const tweetReplied = reactive({
       author: { name: '', username: '', avatar: '' },
       tweetId: '',
@@ -26,7 +24,6 @@ export default defineComponent({
       picture: '',
       dataFetch: false
     })
-
     const picture = ref<HTMLImageElement>(new Image())
     const tweetInput = ref<HTMLElement>()
     const state = reactive({
@@ -37,7 +34,7 @@ export default defineComponent({
       tweeting: false
     })
 
-    onBeforeMount(async () => {
+    watch(store.getters.getReplying, _ => {
       const datas = store.getters.getReplying
       if (datas.replying) {
         tweetReplied.author = datas.author as TweetAuthor
@@ -63,21 +60,21 @@ export default defineComponent({
         formData.append('pictures', state.picture ? state.picture : '')
       }
 
-      // post data to api
-      await axiosInstance.post('/tweets/comment/', formData).then(() => {
-        state.tweeting = false
-        // clear form
-        if (tweetInput.value && picture.value) {
-          tweetInput.value.innerText = 'Tweet your reply'
-          picture.value.src = '#'
-        }
-      })
+      await axiosInstance.post('/tweets/comment/', formData)
+        // clear reply form
+        .then(() => {
+          store.commit('setSuccess', true)
+          if (tweetInput.value && picture.value) {
+            tweetInput.value.innerText = 'Tweet your reply'
+            picture.value.src = '#'
+          }
+        })
+      state.tweeting = false
     }
 
     async function uploadPicture (event: Event) {
       // get file image from event
       const fileImage = event.target as HTMLInputElement
-
       // save file to state
       if (fileImage.files !== null) state.picture = fileImage.files[0]
       // render image preview
@@ -88,7 +85,6 @@ export default defineComponent({
 
     return {
       state,
-      repliedBy,
       tweetReplied,
       picture,
       tweetInput,
@@ -145,6 +141,7 @@ export default defineComponent({
     </div>
     <div class="col-span-11 max-h-56 ml-4 mt-4 px-8">
       <div
+        ref="tweetInput"
         class="forms text-base text-gray-500"
         contenteditable="true"
         @input="(e) => (state.tweet = (e.target as HTMLElement).innerText)"

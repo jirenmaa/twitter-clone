@@ -39,8 +39,6 @@ export default defineComponent({
       tweetId: string
     ): Promise<void> {
       stopEvent(event)
-
-      console.log('responses', authors)
       store.commit('setTweetId', tweetId)
       store.commit('setAuthor', authors)
       store.commit('setContent', content)
