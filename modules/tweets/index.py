@@ -138,7 +138,7 @@ class TweetResponseView(TweetBaseApi):
     def get_queryset(self, id: str) -> List[Tweet]:
         """return queryset of tweet response"""
         object = get_object_or_404(Tweet, pk=id)
-        queryset = self.filter_queryset(object.comments.all())
+        queryset = self.filter_queryset(object.comments.all().order_by("-created_at"))
 
         return queryset
 

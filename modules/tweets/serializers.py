@@ -41,8 +41,8 @@ class TweetPublicSerializer(serializers.ModelSerializer):
         performer = self.context.get("request").auth.payload.get("user_id")
         # check if user is liked the tweet
         liked = instance.likes.user.filter(id=performer).exists()
-        # check if user is commented the tweet
-        commented = instance.comments.filter(author_id=performer).exists()
+        # check if author is commented the tweet
+        commented = instance.comments.filter(author__id=instance.author.id).exists()
         # get responses counts
         count_likes = instance.likes.user.count()
         count_comments = instance.comments.count()
@@ -96,11 +96,21 @@ class TweetPublicPostCommentSerializer(serializers.ModelSerializer):
 class UserTweetPublicLikesSerializer(serializers.ModelSerializer):
     """serializer for default public user liked tweets"""
 
-    author = AuthorTweetSerializer()
+    author = SerializerMethodField(method_name="get_author")
     id = SerializerMethodField(method_name="get_tweetid")
     content = SerializerMethodField(method_name="get_content")
     pictures = SerializerMethodField(method_name="get_pictures")
     responses = SerializerMethodField(method_name="get_responses")
+
+    def get_author(self, instance: UserLikedTweetModel) -> dict:
+        """return tweets author"""
+        return {
+            "name": instance.tweet.author.name,
+            "username": instance.tweet.author.username,
+            "avatar": instance.tweet.author.avatar.url
+            if instance.tweet.author.avatar
+            else "",
+        }
 
     def get_tweetid(self, instance: UserLikedTweetModel) -> str:
         """return tweets id"""
@@ -136,4 +146,10 @@ class UserTweetPublicLikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLikedTweetModel
         fields = "__all__"
-        read_only_fields = ("id", "author", "content", "pictures", "responses",)
+        read_only_fields = (
+            "id",
+            "author",
+            "content",
+            "pictures",
+            "responses",
+        )
