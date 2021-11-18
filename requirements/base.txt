@@ -12,4 +12,4 @@ psycopg2-binary==2.9.1 # https://pypi.org/project/psycopg2-binary/
 redis==3.5.3 # https://pypi.org/project/redis/
 djangorestframework==3.12.4 # https://pypi.org/project/djangorestframework/
 djangorestframework-simplejwt==4.8.0 # https://pypi.org/project/djangorestframework-simplejwt/
-regex @ git+https://bitbucket.org/mrabarnett/mrab-regex/src/hg/setup.py@e3b477cc9304adafe6df2d17714d263549d2cfad
+#regex @ git+https://bitbucket.org/mrabarnett/mrab-regex/src/hg/setup.py@e3b477cc9304adafe6df2d17714d263549d2cfad

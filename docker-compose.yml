@@ -71,6 +71,7 @@ services:
     container_name: service-redis
     networks:
       - application
+    restart: unless-stopped
 
   worker-celery:
     build:
@@ -90,4 +91,4 @@ services:
     depends_on:
       - worker-redis
       - service-database
-    restart: always
+    restart: unless-stopped
