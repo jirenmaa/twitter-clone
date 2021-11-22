@@ -13,7 +13,6 @@ urlpatterns = [
     path("activate/", auth_activation, name="activate"),
     path("reset_activation/", auth_resetactivation, name="reset_activation"),
     path("reset_password/", auth_resetpassword, name="reset_password"),
-
     path("register/", auth_registration, name="register"),
     path("login/", auth_login, name="login"),
     path("logout/", auth_logout, name="logout"),

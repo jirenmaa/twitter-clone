@@ -18,7 +18,7 @@ class AuthResetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ["password"]
-        read_only_fields = ("email")
+        read_only_fields = "email"
 
 
 class AuthObtainTokenSerializer(TokenObtainPairSerializer):

@@ -1,9 +1,11 @@
 import time
+from typing import Any
 import redis
 from datetime import timedelta
 from urllib.parse import quote_plus
 
 from celeryapp.tasks import send_email_activation, send_email_resetpassword
+from celeryapp.workers.mailer import email_activation_link, email_resetpassword_link
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -15,7 +17,7 @@ from modules.auth.serializers import (
 )
 from modules.users.models import User
 from modules.users.serializers import UserPublicSerializer
-from modules.utils.signature import create_sha256_signature
+from modules.utility.signature import create_sha256_signature
 
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
@@ -43,21 +45,19 @@ class AuthRegistrationView(generics.CreateAPIView):
 
     def perform_create_user(self, serializer) -> str:
         """create user by given serialized data"""
-        user = User.objects.create_user(
+        performer = User.objects.create_user(
             email=serializer.validated_data["email"],
             username=generate_username(),
             password=serializer.validated_data["password"],
         )
 
-        return str(user.id)
+        return str(performer.id)
 
     def post(self, request, *args, **kwargs):
         """post create user
         args:
             string: email
             string: passowrd
-        return:
-            user will recive email for user activation
         """
         try:
             # serialize data from request
@@ -69,9 +69,13 @@ class AuthRegistrationView(generics.CreateAPIView):
             signature = create_sha256_signature(performer)
 
             # send email for user activation
-            send_email_activation.apply_async(
-                args=[serializer.initial_data["email"], signature],
-            )
+            if settings.USE_EMAIL_BACKEND:
+                send_email_activation.apply_async(
+                    args=[serializer.initial_data["email"], signature],
+                )
+            else:
+                email_activation_link(serializer.initial_data["email"], signature)
+
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
             redis_client.set(signature, performer, timedelta(minutes=5))
@@ -94,7 +98,7 @@ class AuthActivationView(generics.CreateAPIView):
 
     def activate_user(self, user_id: str) -> None:
         """activate user by id"""
-        performer = get_object_or_404(User, id=user_id)
+        performer = get_object_or_404(User, id=user_id, is_active=False)
         performer.is_active = True
         performer.save()
 
@@ -104,15 +108,15 @@ class AuthActivationView(generics.CreateAPIView):
         try:
             signature = quote_plus(request.data.get("signature"))
             # get user id from redis by signature
-            authen_id = redis_client.get(signature)
+            performer = redis_client.get(signature)
 
-            if authen_id is None:
+            if not isinstance(performer, str):
                 return JsonResponse(
                     {"detail": "activation expired"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
             # activate user
-            self.activate_user(authen_id)
+            self.activate_user(performer)
             # delete signature from redis
             self.delete_signature(signature)
 
@@ -140,10 +144,14 @@ class AuthResetAcivationView(generics.GenericAPIView):
             # generate signature for user reset activation
             signature = create_sha256_signature(str(performer.id))
 
-            # send email for user reset activation
-            send_email_activation.apply_async(
-                args=[serializer.initial_data["email"], signature],
-            )
+            # send email for user activation
+            if settings.USE_EMAIL_BACKEND:
+                send_email_activation.apply_async(
+                    args=[serializer.initial_data["email"], signature],
+                )
+            else:
+                email_activation_link(serializer.initial_data["email"], signature)
+
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
             redis_client.set(signature, str(performer.id), timedelta(minutes=5))
@@ -175,9 +183,15 @@ class AuthResetPasswordView(generics.CreateAPIView):
 
             # generate signature for user reset password
             signature = create_sha256_signature(str(performer.id))
-            send_email_resetpassword.apply_async(
-                args=[performer.initial_data["email"], signature],
-            )
+
+            # send email for user activation
+            if settings.USE_EMAIL_BACKEND:
+                send_email_resetpassword.apply_async(
+                    args=[performer.initial_data["email"], signature],
+                )
+            else:
+                email_resetpassword_link(performer.initial_data["email"], signature)
+
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
             redis_client.set(signature, performer, timedelta(minutes=5))
