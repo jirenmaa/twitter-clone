@@ -1,23 +1,9 @@
-import os
+from configs.settings.loader import *
 from datetime import timedelta
-from pathlib import Path
 
-import dotenv
 
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-
-# read environment variables from .env
-dotenv.read_dotenv(dotenv=os.path.join(BASE_DIR, ".envs/django/.django"))
-dotenv.read_dotenv(dotenv=os.path.join(BASE_DIR, ".envs/postgres/.postgres"))
-
-WEBSITE_URL = os.getenv("WEBSITE_URL")
-
-DATABASE_HOST = os.getenv("POSTGRES_DOCKER_HOST")
-DATABASE_HOST = DATABASE_HOST if DATABASE_HOST else os.getenv("POSTGRES_HOST")
-
-DJANGO_DEFAULT_URL = os.getenv("DJANGO_DEFAULT_URL", "localhost:8000/")
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DJANGO_DEBUG", True)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
@@ -49,7 +35,7 @@ CONN_MAX_AGE = 60 * 5
 # URLS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
-ROOT_URLCONF = "configs.urls"
+ROOT_URLCONF = "configs.router"
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "configs.server.wsgi.application"
 
@@ -57,12 +43,10 @@ WSGI_APPLICATION = "configs.server.wsgi.application"
 # CORS HEADERS
 # ------------------------------------------------------------------------------
 # https://pypi.org/project/django-cors-headers/#cors-allowed-origins
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:8080"]
 
 
-# APPS
+# DJANGO APPS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/3.2/ref/applications/#module-django.apps
 DJANGO_APPS = [
@@ -132,8 +116,6 @@ REST_FRAMEWORK = {
 }
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
-# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
 
 
 # PASSWORDS
@@ -182,7 +164,7 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         "DIRS": [
             os.path.join(BASE_DIR, "modules", "templates"),
-            os.path.join(BASE_DIR, "celeryapp", "workers", "templates"),
+            os.path.join(BASE_DIR, "celeryapp", "templates"),
         ],
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -208,40 +190,46 @@ TEMPLATES = [
 
 # MEDIA STORAGE
 # ------------------------------------------------------------------------------
+USING_CLOUDINARY = os.getenv("CLOUDINARY_API_SECRET", False)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/#configuring-static-files
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/3.2/howto/static-files/#serving-files-uploaded-by-a-user-during-development
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/3.2/ref/files/storage/#module-django.core.files.storage
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+if USING_CLOUDINARY:
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 # https://pypi.org/project/django-cloudinary-storage/
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.getenv("CLOUD_NAME"),
-    "API_KEY": os.getenv("API_KEY"),
-    "API_SECRET": os.getenv("API_SECRET"),
+    "CLOUD_NAME": os.getenv("CLOUDINARY_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
 
 
 # Email
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/3.2/topics/email/#smtp-backend
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
-EMAIL_TIMEOUT = 5
-# https://docs.djangoproject.com/en/3.2/ref/settings/#email-host
-EMAIL_HOST = "smtp.gmail.com"
+USE_EMAIL_BACKEND = False
 # https://docs.djangoproject.com/en/3.2/ref/settings/#email-host-user
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 # https://docs.djangoproject.com/en/3.2/ref/settings/#email-host-password
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+# https://docs.djangoproject.com/en/3.2/topics/email/#smtp-backend
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    USE_EMAIL_BACKEND = True
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
+EMAIL_TIMEOUT = 5
+# https://docs.djangoproject.com/en/3.2/ref/settings/#email-host
+EMAIL_HOST = "smtp.gmail.com"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#email-port
 EMAIL_PORT = 587
 # https://docs.djangoproject.com/en/3.2/ref/settings/#email-use-tls
 EMAIL_USE_TLS = True
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = "twitter-clone <noreply@twitter-clone.com>"
+DEFAULT_FROM_EMAIL = "twitter clone <noreply@twitter-clone.com>"
 
 
 # JWT
@@ -284,6 +272,7 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "Asia/Bangkok")
 CELERY_ENABLE_UTC = True
 CELERY_RESULT_EXPIRES = timedelta(seconds=10)
+
 
 # REDIS
 # ------------------------------------------------------------------------------
