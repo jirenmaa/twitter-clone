@@ -124,9 +124,9 @@ export default defineComponent({
       <div class="space-y-4">
         <div class="text-base space-x-1">
           <span>{{ tweetReplied.content }}</span>
-          <span v-if="tweetReplied.picture" class="text-blue-400">
+          <span v-if="tweetReplied.picture" class="break-all text-blue-400">
             <a :href="tweetReplied.picture">
-              picture: {{ tweetReplied.picture.split('/').pop() }}
+              {{ tweetReplied.picture.split('/').pop() }}
             </a>
           </span>
         </div>
