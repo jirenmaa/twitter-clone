@@ -280,5 +280,6 @@ tags
 .postgres
 
 .vscode/
-awdsada/
+locals/
+media/
 node_modules/
