@@ -1,50 +1,60 @@
+from django.conf import settings
 from django.core.mail import EmailMessage
-
 from django.template.loader import get_template
 
 
-def url_maker(scheme: str, host: str, path: str, parameters: list = None) -> str:
-    general = "{0}://{1}/{2}".format(scheme, host, path)
+def url_constructor(path: str, parameters: list, **kwargs) -> str:
+    """return url"""
+    scheme = kwargs.get("scheme", "http")
+    host = kwargs.get("host", settings.WEBSITE_URL)
 
+    # construct url
+    general = "{0}://{1}/{2}".format(scheme, host, path)
     for parameter in parameters:
         general += "/{0}".format(parameter)
 
     return general
 
 
-def email_activation_link(recipient: list, hash: str, **kwargs):
-    """send email activation to recipeint email"""
-    SCHEME = kwargs.get("scheme", "http")
-    XHOSTS = kwargs.get("xhosts", "localhost:8080")
-    HASHKEY = "?key={0}".format(hash)
+def generate_email_from_template(recipient: str, template: str, **kwargs) -> str:
+    """return email render template"""
+    signature = "?key={0}".format(kwargs.get("signature"))
 
-    SUBJECT = "Account Activation"
-    FROMAIL = "twitter clone <noreply@twitter-clone.com>"
+    # context for template
     context = {
         "recepient": recipient,
-        "activation_link": url_maker(SCHEME, XHOSTS, "activation", [HASHKEY])
+        "url": url_constructor(path="activation", parameters=[signature], **kwargs),
     }
+    return get_template("{0}.html".format(template)).render(context)
 
-    content = get_template("account_activation.html").render(context)
-    mailing = EmailMessage(SUBJECT, content, from_email=FROMAIL, to=[recipient])
+
+def email_activation_link(recipient: str, hash: str, **kwargs) -> None:
+    """send email activation to recipeint email"""
+    content = generate_email_from_template(
+        recipient, "activation", signature=hash, **kwargs
+    )
+    # construct email message
+    mailing = EmailMessage(
+        subject="Account Activation",
+        body=content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[recipient],
+    )
     mailing.content_subtype = "html"
     mailing.send()
 
 
-def email_resetpassword_link(recipient: list, hash: str, **kwargs):
+def email_resetpassword_link(recipient: str, hash: str, **kwargs) -> None:
     """send email resetpassword to recipeint email"""
-    SCHEME = kwargs.get("SCHEME", "http")
-    XHOSTS = kwargs.get("HOSTS", "localhost:8080")
-    HASHKEY = "?key={0}".format(hash)
-
-    SUBJECT = "Reset Password"
-    FROMAIL = "twitter clone <noreply@twitter-clone.com>"
-    context = {
-        "recepient": recipient,
-        "resetpassword_link": url_maker(SCHEME, XHOSTS, "resetpassword", [HASHKEY])
-    }
-
-    content = get_template("resetpassword.html").render(context)
-    mailing = EmailMessage(SUBJECT, content, from_email=FROMAIL, to=[recipient])
+    content = generate_email_from_template(
+        recipient, "resetpassword", signature=hash, **kwargs
+    )
+    # construct email message
+    mailing = EmailMessage(
+        subject="Reset Password",
+        body=content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[recipient],
+    )
     mailing.content_subtype = "html"
     mailing.send()

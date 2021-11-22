@@ -1,14 +1,14 @@
 from celeryapp.artisan import app as artisan
-from celeryapp.workers.mailer import email_activation_link, email_resetpassword_link
+from celeryapp.workers import mailer
 
 
 @artisan.task(name="send_email_activation")
-def send_email_activation(recepients: list, hashkey: str, **kwargs):
+def send_email_activation(recepients: str, hashkey: str, **kwargs):
     """Send activation link to user email"""
-    email_activation_link(recepients, hashkey, **kwargs)
+    mailer.email_activation_link(recepients, hashkey, **kwargs)
 
 
 @artisan.task(name="send_email_resetpassword")
-def send_email_resetpassword(recepients: list, hashkey: str, **kwargs):
+def send_email_resetpassword(recepients: str, hashkey: str, **kwargs):
     """Send resetpassword link to user email"""
-    email_resetpassword_link(recepients, hashkey, **kwargs)
+    mailer.email_resetpassword_link(recepients, hashkey, **kwargs)
