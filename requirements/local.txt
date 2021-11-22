@@ -1,4 +1,5 @@
 -r base.txt
 
+regex @ git+https://bitbucket.org/mrabarnett/mrab-regex/src/hg/setup.py@e3b477cc9304adafe6df2d17714d263549d2cfad
 black==21.9b0 # https://pypi.org/project/black/
 cookiecutter==1.7.3 # https://pypi.org/project/cookiecutter/
