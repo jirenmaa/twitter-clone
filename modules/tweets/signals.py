@@ -1,11 +1,11 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .models import Tweet, ResponseLike
+from modules.tweets.models import Tweet, ResponseLike
 
 
 def trigger():
-    """An empty method to trigger the signals"""
+    """just an empty method to trigger the signals"""
     pass
 
 

@@ -1,4 +1,5 @@
-from django.db.models.fields.files import ImageFieldFile
+from django.db.models.fields.files import ImageField
+from django.conf import settings
 
 from modules.tweets.models import (
     ResponseComment as CommentModel,
@@ -122,7 +123,15 @@ class UserTweetPublicLikesSerializer(serializers.ModelSerializer):
 
     def get_pictures(self, instance: UserLikedTweetModel) -> str:
         """return tweets picture"""
-        return instance.tweet.pictures.url if instance.tweet.pictures else ""
+        http_host = self.context.get("request").META.get("HTTP_HOST")
+
+        if not instance.tweet.pictures:
+            return ""
+
+        if not settings.USING_CLOUDINARY and settings.DEBUG:
+            return "http://" + http_host + instance.tweet.pictures.url
+
+        return instance.tweet.pictures.url
 
     def get_responses(self, instance: UserLikedTweetModel) -> dict:
         """return responses for each tweet"""
@@ -146,10 +155,4 @@ class UserTweetPublicLikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLikedTweetModel
         fields = "__all__"
-        read_only_fields = (
-            "id",
-            "author",
-            "content",
-            "pictures",
-            "responses",
-        )
+        read_only_fields = ("id", "author", "content", "pictures", "responses")

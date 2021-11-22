@@ -7,6 +7,7 @@ class TweetsConfig(AppConfig):
 
     def ready(self):
         from . import signals
+
         signals.trigger()
 
         return super().ready()

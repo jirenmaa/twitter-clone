@@ -79,10 +79,13 @@ class ResponseComment(models.Model):
     def __str__(self):
         return str(self.id)
 
+
 class ResponseUserLikedTweet(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, related_name="liked_tweet", on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User, related_name="liked_tweet", on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
