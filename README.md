@@ -1,6 +1,6 @@
 <p>
   <h1>Twitter Clone</h1>
-  <p>A Twitter clone project</p>
+  <p>Attempting to create a twitter clone project</p>
 </p>
 
 ## Table Of Contents
@@ -16,7 +16,7 @@
 
 ## About The Project
 
-this is an experimental project that I choose to learning more about frontend and backend and how they work together.
+This is an experimental project that I choose to learn more about frontend and backend development and how they interact.
 
 ## Built With
 
@@ -24,8 +24,8 @@ this is an experimental project that I choose to learning more about frontend an
 | :----------------------------------------------------------------: | :-----------------------------------------------: | :-------------------------------------------------: |
 | ![https://www.django-rest-framework.org](git-images/icons8-django.png) | ![https://v3.vuejs.org](git-images/icons8-vue-js.png) | ![https://www.docker.com](git-images/icons8-docker.png) |
 
-
 ## Features
+
 - [x] Authentication
 - [x] User Profile (tweets, media, replies, liked tweets)
 - [x] Create Tweet
@@ -36,23 +36,19 @@ this is an experimental project that I choose to learning more about frontend an
 
 ## Getting Started
 
-Assume you've installed `python`, `node`, `docker` (optional), `redis` (for email queue) to run the project.
-
 ### Running locally with docker 🐳
-
-clone the git repository
 
 ```sh
 $ git clone https://github.com/jirenmaa/twitter-clone.git
 ```
 
-running the docker compose file
+running the docker compose
 
 ```sh
 $ docker-compose build && docker-compose up -d
 ```
 
-if you are not setting up for email configuration, u have to run the django container to recive the email
+If you are not configuring email, you must run the django container to receive emails for your user registration.
 
 ```sh
 $ docker-compose run --rm service-backend
@@ -60,7 +56,7 @@ $ docker-compose run --rm service-backend
 
 ### Running locally with git clone
 
-clone the git repository
+Assume you have 'python', 'node', 'docker' (optional), and'redis' (for email queue) installed to run the project.
 
 ```sh
 $ git clone https://github.com/jirenmaa/twitter-clone.git
@@ -76,12 +72,10 @@ $ pip install -r requirements.txt
 $ cd website && yarn install
 ```
 
-after installing both depdencies, you have to setup `.env` file to running the project.
-
-after you have setting up `.env`, you now can running redis and celery.
+After installing both dependencies, you must configure the '.env' file in order to run the project. After you've set up '.env,' you can now start redis and celery.
 
 ```sh
-NOTE: you have to let the redis server keep running and not closing the console
+NOTE: You must leave the redis server running by not close the terminal.
 
 $ redis-server
 ```
@@ -90,13 +84,11 @@ $ redis-server
 $ celery -A celeryapp.tasks worker -l info
 ```
 
-before you can run the django, you have to create database first in postgresql.
+Before you can run Django, you must first create a database in Postgresql. Or you can do this by running the following command:
 
 ```sh
 $ createdb -U username -O password twitter-clone
 ```
-
-or you can create manually in `psql` console.
 
 running the rest of the project
 
