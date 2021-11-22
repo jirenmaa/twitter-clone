@@ -87,7 +87,7 @@ $ celery -A celeryapp.tasks worker -l info
 Before you can run Django, you must first create a database in Postgresql. Or you can do this by running the following command:
 
 ```sh
-$ createdb -U username -O password twitter-clone
+$ createdb -U postgres twitter-clone
 ```
 
 running the rest of the project
