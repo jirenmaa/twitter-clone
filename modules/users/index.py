@@ -130,6 +130,20 @@ class UserPublicLikesView(UserBaseApi):
 
     serializer_class = UserTweetPublicLikesSerializer
 
+    def list(self, request, username: str, *args, **kwargs):
+        """return list of user tweet with pagination"""
+        try:
+            # serialize data from database and paginate
+            # by default, paginate by 10
+            queryset = self.filter_queryset(self.get_queryset(username))
+            serializer = self.get_serializer(
+                queryset, many=True, context={"request": request}
+            )
+
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        except Exception as ex:
+            return JsonResponse({"detail": ex.args}, status=status.HTTP_400_BAD_REQUEST)
+
     def get_queryset(self, username: str) -> List[ResponseUserLikedTweet]:
         """return list of user tweet"""
         return (
