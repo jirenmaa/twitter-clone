@@ -1,0 +1,17 @@
+# you can left this empty and by default it will use
+# django file storage system and will save the image in local folder
+CLOUDINARY_NAME=
+CLOUDINARY_API_SECRET=
+CLOUDINARY_API_KEY=
+
+WEBSITE_URL=localhost:8080
+DJANGO_DEBUG=False
+DJANGO_SECRET_KEY=
+
+ACCESS_TOKEN_LIFETIME=1
+REFRESH_TOKEN_LIFETIME=2
+
+# you can left this empty by default it will use
+# django console backend email as the sender
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
