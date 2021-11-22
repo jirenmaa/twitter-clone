@@ -28,15 +28,15 @@ services:
   service-backend:
     build:
       context: .
-      dockerfile: ./compose/backend/Dockerfile
+      dockerfile: ./compose/rest/Dockerfile
     container_name: service-backend
     volumes:
-      - local_backend_data:/usr/src/backend:z
+      - local_backend_data:/usr/src:z
     command:
-      - /usr/src/backend/compose/backend/runserver
+      - /usr/src/compose/backend/runserver
     env_file:
-      - ./.envs/django/.django
-      - ./.envs/postgres/.postgres
+      - ./.envs/.django
+      - ./.envs/.postgres
     environment:
       POSTGRES_DOCKER_HOST: service-database
       REDIS_HOST: worker-redis
@@ -55,7 +55,7 @@ services:
   service-frontend:
     build:
       context: .
-      dockerfile: ./compose/frontend/Dockerfile
+      dockerfile: ./compose/web/Dockerfile
     container_name: service-frontend
     networks:
       - application
@@ -68,7 +68,7 @@ services:
 
   worker-redis:
     image: redis:6
-    container_name: service-redis
+    container_name: worker-redis
     networks:
       - application
     restart: unless-stopped
@@ -76,12 +76,12 @@ services:
   worker-celery:
     build:
       context: .
-      dockerfile: ./compose/celeryapp/Dockerfile
+      dockerfile: ./compose/celery/Dockerfile
     container_name: worker-celery
     command: celery -A celeryapp.tasks worker -l info
     env_file:
-      - ./.envs/django/.django
-      - ./.envs/postgres/.postgres
+      - ./.envs/.django
+      - ./.envs/.postgres
     environment:
       CELERY_TIMEZONE: UTC
       CELERY_BROKER_URL: redis://worker-redis:6379/0
