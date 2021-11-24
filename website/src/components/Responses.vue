@@ -1,9 +1,18 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
-import axiosInstance from '@/services/axios'
+import { defineComponent, watch } from 'vue'
+
+import {
+  responseLikeUnlineTweet,
+  responseReplyTweet,
+  responseReplyDetailTweet
+} from '@/modules/tweets/services/actions'
 
 import store from '@/store'
-import { Tweet, TweetAuthor, TweetResponse } from '@/modules/tweets/types'
+import {
+  TweetAuthor,
+  TweetResponse,
+  StoreTweetReply
+} from '@/modules/tweets/types'
 import { stopEvent, formatNumWithAbbreviation } from '@/utils/helper'
 
 import TweetReply from '@/icons/TweetReply.vue'
@@ -39,40 +48,41 @@ export default defineComponent({
       tweetId: string
     ): Promise<void> {
       stopEvent(event)
-      store.commit('setTweetId', tweetId)
-      store.commit('setAuthor', authors)
-      store.commit('setContent', content)
-      store.commit('setPicture', picture)
-      store.commit('setReplying', true)
+      store.commit('setReplyState', {
+        replying: true,
+        tweetId: tweetId,
+        author: authors,
+        picture: picture,
+        content: content
+      } as StoreTweetReply)
     }
+
+    watch(store.getters.getReplying, data => {
+      if (data.replying && data.success) {
+        const tweetPublic = document.querySelector(
+          `div[response-id='${data.tweetId}']`
+        )
+        const tweetDetail = document.querySelector(
+          `div[response-detail-id='${data.tweetId}']`
+        )
+
+        if (tweetDetail === null) {
+          console.log('in tweet public')
+          responseReplyTweet(tweetPublic as Element)
+          store.commit('setResetState')
+        }
+        if (tweetPublic && tweetDetail) {
+          console.log('in tweet detail')
+          responseReplyDetailTweet(tweetDetail as Element)
+        }
+      }
+    })
 
     async function likeTweet (event: Event, id: string): Promise<void> {
       stopEvent(event)
 
-      const tweat = document.querySelector(`div[response-id='${id}']`)
-      const domLike = tweat?.children[2].children[0]
-
-      if (domLike !== undefined) {
-        let likeCount = Number(domLike.getAttribute('data-count'))
-
-        if (domLike.getAttribute('data-liked') === 'true') {
-          await axiosInstance.delete(`/tweets/like/${id}`)
-          likeCount -= 1
-          domLike.classList.remove('liked')
-          domLike.setAttribute('data-liked', 'false')
-        } else {
-          await axiosInstance.put(`/tweets/like/${id}`)
-          likeCount += 1
-          domLike.classList.add('liked')
-          domLike.setAttribute('data-liked', 'true')
-        }
-
-        domLike.setAttribute('data-count', likeCount.toString());
-        (domLike
-          .children[1] as HTMLElement).innerText = formatNumWithAbbreviation(
-          likeCount
-        )
-      }
+      const tweet = document.querySelector(`div[response-id='${id}']`)
+      responseLikeUnlineTweet(event, tweet as HTMLElement, id)
     }
 
     return { likeTweet, replyTweet, formatNumWithAbbreviation }
@@ -90,12 +100,13 @@ export default defineComponent({
       <div
         class="flex items-center cursor-pointer response-hover space-x-2"
         @click="replyTweet($event, authors, picture, content, tweetId)"
+        :data-count="responses?.comments_count"
       >
         <span class="hover-reply">
           <TweetReply class="rounded-full transform scale-125 p-1" />
         </span>
-        <span v-if="responses?.comments_count" class="hover-reply">{{
-          responses?.comments_count
+        <span v-if="!details" class="hover-reply">{{
+          formatNumWithAbbreviation(responses?.comments_count as number)
         }}</span>
       </div>
     </div>
@@ -108,7 +119,7 @@ export default defineComponent({
         <span class="hover-retweet">
           <TweetRetweet class="rounded-full transform scale-125 p-1" />
         </span>
-        <span v-if="0" class="hover-retweet">{{ 0 }}</span>
+        <span v-if="0" class="hover-retweet">{{ formatNumWithAbbreviation(0) }}</span>
       </div>
     </div>
     <div
@@ -127,8 +138,9 @@ export default defineComponent({
           <TweetLike class="rounded-full transform scale-125 p-1" />
         </span>
         <span
+          v-if="!details"
           class="hover-like"
-          >{{ formatNumWithAbbreviation((responses?.likes_count as number)) }}</span
+          >{{ formatNumWithAbbreviation(responses?.likes_count as number) }}</span
         >
       </div>
     </div>

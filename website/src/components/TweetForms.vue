@@ -17,7 +17,7 @@ export default defineComponent({
     const picture = ref<HTMLImageElement>(new Image())
     const tweetInput = ref<HTMLElement>()
     const state = reactive({
-      picture: ref<File>(),
+      picture: ref<any>(),
       imgAlt: '',
       tweet: '',
       error: '',
@@ -28,20 +28,24 @@ export default defineComponent({
       state.tweeting = true
       const formData = new FormData()
 
-      // append data to form-data
+      if (!state.tweet && !state.picture) {
+        return
+      }
+
       if (state.tweet || state.picture) {
         formData.append('content', state.tweet)
         formData.append('pictures', state.picture ? state.picture : '')
       }
 
-      // post data to api
       await axiosInstance.post('/tweets/', formData).then(() => {
-        state.tweeting = false
-        // clear form
-        if (tweetInput.value && picture.value) {
+        if (tweetInput.value) {
           tweetInput.value.innerText = 'What\'s in your mind?'
-          picture.value.src = '#'
         }
+
+        picture.value.src = '#'
+        state.picture = null
+        state.tweet = ''
+        state.tweeting = false
 
         emit('tweetSent')
       })
@@ -67,7 +71,7 @@ export default defineComponent({
 <template>
   <form
     @submit.prevent="sendTweet"
-    class="flex flex-col rounded border mt-8 p-4"
+    class="flex flex-col mt-4 p-4"
     :class="[
       { 'border-green-500': state.tweeting },
       { 'border-dark-grey': !state.tweeting }
@@ -96,13 +100,9 @@ export default defineComponent({
       />
     </div>
     <div class="ml-10 pl-4">
-      <div
-        class="flex justify-between items-center border-t border-dark-grey pt-4"
-      >
+      <div class="flex justify-between items-center border-t border-dark-grey pt-4">
         <div class="flex space-x-4">
-          <div
-            class="inline-flex space-x-2 transition ease-in-out duration-300"
-          >
+          <div class="inline-flex space-x-2 transition ease-in-out duration-300">
             <div class="flex items-center cursor-pointer image-hover space-x-2">
               <input
                 id="uploadPicture"
@@ -112,17 +112,12 @@ export default defineComponent({
                 @change="uploadPicture($event)"
               />
               <label for="uploadPicture" title="Media" class="cursor-pointer">
-                <FormImage
-                  class="rounded-full transform scale-125 transition ease-in-out duration-300 p-1"
-                />
+                <FormImage class="rounded-full transform scale-125 transition ease-in-out duration-200 p-1"/>
               </label>
             </div>
           </div>
         </div>
-        <button
-          type="submit"
-          class="cursor-pointer rounded bg-dark-grey px-8 py-1.5"
-        >
+        <button type="submit" class="cursor-pointer bg-dark-light hover:bg-dark-grey rounded px-8 py-1.5 z-10">
           Tweet
         </button>
       </div>

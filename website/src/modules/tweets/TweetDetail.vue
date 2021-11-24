@@ -38,7 +38,7 @@ export default defineComponent({
       state.loading = false
     })
 
-    watch(store.getters.getReplying, _value => {
+    watch(store.getters.getReplying, _ => {
       state.replying = store.getters.getReplying.replying
     })
 
@@ -54,46 +54,26 @@ export default defineComponent({
 <template>
   <div class="relative">
     <div
-      v-show="state.replying"
-      class="fixed top-0 left-0 w-full h-screen grid place-items-center bg-dark bg-opacity-90 z-50"
-    >
+      v-show="state.replying" class="fixed top-0 left-0 w-full h-screen grid place-items-center bg-dark bg-opacity-90 z-50">
       <ReplyForm class="border bg-dark" />
     </div>
-    <div
-      class="flex items-center space-x-6 border-b border-l border-r border-dark-grey bg-body cursor-pointer sticky top-0 z-20 p-4"
-    >
-      <router-link
-        to="/"
-        class="transition ease-in-out duration-200 rounded-full hover:bg-dark-grey p-1"
-      >
+    <div class="flex items-center space-x-6 border-b border-dark-grey bg-body cursor-pointer sticky top-0 z-20 p-4">
+      <router-link to="/" class="transition ease-in-out duration-200 rounded-full hover:bg-dark-grey p-1">
         <ArrowLeft class="transform scale-90" />
       </router-link>
       <div class="font-medium text-lg" @click="scrollTopThread">Thread</div>
     </div>
-    <LoadingSpinner
-      v-if="state.loading"
-      class="grid place-items-center mt-12"
-    />
-    <div
-      class="flex flex-col border border-dark-grey rounded space-y-4 my-8 p-4"
-      v-if="state.tweet"
-    >
+    <LoadingSpinner v-if="state.loading" class="grid place-items-center mt-12"/>
+
+    <div v-if="state.tweet" class="flex flex-col border-b border-dark-grey space-y-4 mt-4 p-4">
       <div class="flex items-center space-x-4">
-        <div
-          class="w-14 h-14 bg-dark border border-dark-grey rounded-full cursor-pointer"
+        <div class="w-14 h-14 bg-dark border border-dark-grey rounded-full cursor-pointer"
           @click="
-            redirect($event, 'user-tweet', {
-              username: state.tweet[0]?.author.username
-            })
-          "
+            redirect($event, 'user-tweet', {username: state.tweet[0]?.author.username})"
         ></div>
-        <div
-          class="flex flex-col cursor-pointer on-hover"
+        <div class="flex flex-col cursor-pointer on-hover"
           @click="
-            redirect($event, 'user-tweet', {
-              username: state.tweet[0]?.author.username
-            })
-          "
+            redirect($event, 'user-tweet', {username: state.tweet[0]?.author.username})"
         >
           <div class="font-medium text-base hovered">
             {{ state.tweet[0]?.author.name || state.tweet[0]?.author.username }}
@@ -118,14 +98,18 @@ export default defineComponent({
       </picture>
       <div class="divide-y divide-dark-grey space-y-3">
         <div class="flex text-peach text-ms space-x-2">
-          <span>{{
-            moment(state.tweet[0]?.created_at).format("h:mm a • MMMM Do, YYYY")
-          }}</span>
+          <span>
+            {{moment(state.tweet[0]?.created_at).format("h:mm a • MMMM Do, YYYY")}}
+          </span>
           <span>•</span>
           <span>Tweeted From Web</span>
         </div>
-        <div class="flex text-base space-x-6 pt-3">
-          <div class="space-x-1">
+        <div
+          class="flex text-base space-x-6 pt-3"
+          :response-detail-id='state.tweet[0]?.id'>
+          <div
+            class="space-x-1"
+            :data-count="state.tweet[0]?.responses?.comments_count">
             <span class="text-white">{{
               state.tweet[0]?.responses?.comments_count
             }}</span>
@@ -157,7 +141,7 @@ export default defineComponent({
     </div>
     <div
       v-if="state.tweet[0]"
-      class="flex flex-col border border-dark-grey rounded space-y-4 my-8"
+      class="flex flex-col border-b border-dark-grey mb-8"
     >
       <TweetDetailDiscussion :tweetId="state.tweet[0]?.id" />
     </div>

@@ -71,19 +71,14 @@ export default defineComponent({
       </div>
     </div>
   </div>
-  <div
-    class="grid grid-cols-4 text-center text-peach border border-dark-grey rounded cursor-pointer mt-4"
-  >
+  <div class="grid grid-cols-4 text-center text-peach border-b border-dark-grey cursor-pointer mt-4">
     <div
       v-for="(item, index) in state.tabArrays"
       v-bind:key="index"
       class="capitalize hover:bg-dark py-4"
       :class="{ [state.active]: checkActiveTab(item, state.currentTab) }"
       @click="
-        redirect($event, camelToDashCase(item), {
-          username: state.performer.username
-        })
-      "
+        redirect($event, camelToDashCase(item), {username: state.performer.username})"
     >
       {{ camelToDashCase(item).split("-")[1] }}
     </div>

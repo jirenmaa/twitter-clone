@@ -1,17 +1,17 @@
 import { StoreOptions } from 'vuex'
-import { StoreTweetReply, TweetAuthor } from '../types'
+import { StoreTweetReply, TweetAuthor } from '@/modules/tweets/types'
 
 const resetState = (): StoreTweetReply => ({
   replying: false,
   tweetId: '',
   picture: '',
   content: '',
-  success: false,
   author: {
     username: '',
     name: '',
     avatar: ''
-  }
+  },
+  success: false
 })
 
 const StoreTweetReply: StoreOptions<any> = {
@@ -41,6 +41,13 @@ const StoreTweetReply: StoreOptions<any> = {
     },
     setSuccess (state: StoreTweetReply, success: boolean): void {
       state.success = success
+    },
+    setReplyState (state: StoreTweetReply, data: StoreTweetReply): void {
+      state.replying = data.replying
+      state.tweetId = data.tweetId
+      state.author = data.author
+      state.content = data.content
+      state.picture = data.picture
     },
     setResetState (state: StoreTweetReply): void {
       Object.assign(state, resetState())

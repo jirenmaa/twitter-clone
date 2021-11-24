@@ -7,6 +7,7 @@ export type ErrorLogin = {
 }
 
 export type StateUser = {
+  name: string;
   username: string;
   avatar: string;
 }

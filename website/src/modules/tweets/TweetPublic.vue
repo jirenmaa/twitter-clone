@@ -46,15 +46,19 @@ export default defineComponent({
 </script>
 
 <template>
+  <div class="sticky top-0 bg-body z-50">
+    <div class="flex justify-between items-center border-b border-dark-grey p-4">
+      <span class="font-semibold text-lg">Home</span>
+    </div>
+  </div>
+  <TweetForms @tweetSent="fetchTweets" class="border-b border-dark-grey" />
   <div
-    v-show="state.replying"
-    class="fixed top-0 left-0 w-full h-screen grid place-items-center bg-dark bg-opacity-70 z-50"
-  >
+    v-show="state.replying" class="fixed top-0 left-0 w-full h-screen grid place-items-center bg-dark bg-opacity-70 z-50">
     <ReplyForm class="border bg-dark" />
   </div>
-  <TweetForms @tweetSent="fetchTweets" />
-  <LoadingSpinner v-if="state.loading" class="grid place-items-center" />
-  <div v-else class="flex flex-col space-y-4">
+
+  <LoadingSpinner v-if="state.loading" class="grid place-items-center my-12" />
+  <div v-else class="flex flex-col mb-4">
     <TweetCards
       v-for="(tweet, index) in state.tweets"
       v-bind:key="index" :tweet="tweet" />

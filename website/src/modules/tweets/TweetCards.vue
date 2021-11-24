@@ -5,10 +5,12 @@ import { redirect } from '@/utils/helper'
 import { Tweet } from '@/modules/tweets/types'
 
 import Responses from '@/components/Responses.vue'
+import IconMore from '@/icons/IconMore.vue'
 
 export default defineComponent({
   name: 'TweetCards',
   components: {
+    IconMore,
     Responses
   },
   props: {
@@ -34,7 +36,7 @@ export default defineComponent({
 
 <template>
   <div
-    class="grid grid-cols-12 cursor-pointer border border-dark-grey rounded hover:bg-dark"
+    class="grid grid-cols-12 cursor-pointer border-b border-dark-grey hover:bg-dark"
     @click="redirect($event, 'tweet-detail', state.parameter)"
   >
     <div class="col-span-1 relative overflow-hidden mx-auto py-4 pl-4">
@@ -45,16 +47,21 @@ export default defineComponent({
       ></div>
     </div>
     <div class="col-span-11 space-y-2 ml-4 p-4">
-      <div class="flex items-center">
+      <div class="flex justify-between items-center">
         <div
           data-event="user-profile"
-          class="inline-flex items-center cursor-pointer space-x-1 on-hover"
+          class="inline-flex items-center cursor-pointer space-x-1 on-hover z-10"
           @click="redirect($event, 'user-tweet', { username: tweet?.author.username })"
         >
-          <span class="font-medium text-lg hovered">
+          <span class="font-medium text-base hovered">
             {{ tweet?.author.name || authorUsername }}
           </span>
           <span class="text-peach text-sm">@{{ authorUsername }}</span>
+        </div>
+        <div class="inline-flex cursor-pointer hover-more">
+          <IconMore
+            class="rounded-full transform scale-125 transition ease-in-out duration-200 p-1"
+          />
         </div>
       </div>
       <div v-html="tweet?.content" class="break-words text-ms pb-2"></div>
@@ -92,3 +99,12 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
+<style lang="scss">
+.hover-more:hover {
+  svg {
+    background: rgba(52, 211, 153, 0.1);
+    stroke: #34d399;
+  }
+}
+</style>

@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted, reactive } from 'vue'
+import { defineComponent, ref, watch, reactive } from 'vue'
 import axiosInstance from '@/services/axios'
 
 import store from '@/store'
-import { TweetAuthor } from '@/modules/tweets/types'
 
 import ButtonSubmit from '@/components/shared/ButtonSubmit.vue'
 import IconImage from '@/icons/FormImage.vue'
@@ -27,7 +26,7 @@ export default defineComponent({
     const picture = ref<HTMLImageElement>(new Image())
     const tweetInput = ref<HTMLElement>()
     const state = reactive({
-      picture: ref<File>(),
+      picture: ref<any>(),
       imgAlt: '',
       tweet: '',
       error: '',
@@ -37,7 +36,7 @@ export default defineComponent({
     watch(store.getters.getReplying, _ => {
       const datas = store.getters.getReplying
       if (datas.replying) {
-        tweetReplied.author = datas.author as TweetAuthor
+        tweetReplied.author = datas.author
         tweetReplied.tweetId = datas.tweetId
         tweetReplied.content = datas.content
         tweetReplied.picture = datas.picture
@@ -53,21 +52,26 @@ export default defineComponent({
       state.tweeting = true
       const formData = new FormData()
 
-      // append data to form-data
       if (state.tweet || state.picture) {
         formData.append('tweet', tweetReplied.tweetId)
         formData.append('content', state.tweet)
         formData.append('pictures', state.picture ? state.picture : '')
       }
 
-      await axiosInstance.post('/tweets/comment/', formData)
-        // clear reply form
+      await axiosInstance
+        .post('/tweets/comment/', formData)
         .then(() => {
-          store.commit('setSuccess', true)
-          if (tweetInput.value && picture.value) {
+          if (tweetInput.value !== undefined) {
             tweetInput.value.innerText = 'Tweet your reply'
-            picture.value.src = '#'
           }
+
+          if (state.tweet || state.picture) {
+            picture.value.src = '#'
+            state.tweet = ''
+            state.picture = null
+          }
+
+          store.commit('setSuccess', true)
         })
       state.tweeting = false
     }
@@ -99,7 +103,7 @@ export default defineComponent({
 <template>
   <form
     @submit.prevent="sendReply"
-    class="grid grid-cols-12 relative w-form form-wrap overflow-y-auto rounded border"
+    class="grid grid-cols-12 relative w-reply-form form-wrap overflow-y-auto rounded border"
     :class="[
       { 'border-green-500': state.tweeting },
       { 'border-dark-grey': !state.tweeting }

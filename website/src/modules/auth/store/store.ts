@@ -3,6 +3,7 @@ import { StateUser, StateToken, StateAuthen } from '../types'
 
 const resetState = (): StateAuthen => ({
   user: {
+    name: '',
     username: '',
     avatar: ''
   },
