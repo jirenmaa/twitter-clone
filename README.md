@@ -18,11 +18,13 @@
 
 This is an experimental project that I choose to learn more about frontend and backend development and how they interact.
 
+![preview](git-assets/preview.gif)
+
 ## Built With
 
 |                       Django Rest Framework                        |                      Vue JS                       |                       Docker                        |
 | :----------------------------------------------------------------: | :-----------------------------------------------: | :-------------------------------------------------: |
-| ![https://www.django-rest-framework.org](git-images/icons8-django.png) | ![https://v3.vuejs.org](git-images/icons8-vue-js.png) | ![https://www.docker.com](git-images/icons8-docker.png) |
+| ![https://www.django-rest-framework.org](git-assets/icons8-django.png) | ![https://v3.vuejs.org](git-assets/icons8-vue-js.png) | ![https://www.docker.com](git-assets/icons8-docker.png) |
 
 ## Features
 
@@ -32,7 +34,6 @@ This is an experimental project that I choose to learn more about frontend and b
 - [ ] Delete Tweet
 - [x] Like, Unlike Tweet
 - [x] Reply Tweet
-- [ ] Follow, Unfollow User
 
 ## Getting Started
 

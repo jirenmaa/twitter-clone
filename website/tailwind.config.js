@@ -7,8 +7,10 @@ module.exports = {
         current: '#cccccc',
         black: '#111111',
         dark: '#181818',
-        peach: '#707070',
+        active: '#34d399',
         body: '#131313',
+        peach: '#707070',
+        'dark-light': '#202020',
         'dark-grey': '#333333',
         'dark-peach': '#91887d',
       },
@@ -25,6 +27,7 @@ module.exports = {
       width: {
         input: '32rem',
         form: '36rem',
+        'reply-form': '40rem',
         '0.25': '0.075rem'
       },
       scale: {
