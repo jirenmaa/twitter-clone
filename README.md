@@ -104,7 +104,7 @@ $ python3 manage.py runserver
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](https://github.com/jirenmaa/https://github.com/jirenmaa/twitter-clone/blob/main/LICENSE.md) for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/jirenmaa/twitter-clone/blob/master/LICENSE) for more information.
 
 ## Authors
 
