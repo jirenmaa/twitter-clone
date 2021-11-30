@@ -1,7 +1,7 @@
 POSTGRES_ENGINE=django.db.backends.postgresql_psycopg2
 POSTGRES_DB=twitter-clone
-POSTGRES_USER=
-POSTGRES_PASSWORD=
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 
