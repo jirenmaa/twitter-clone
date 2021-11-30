@@ -1,5 +1,4 @@
 import time
-from typing import Any
 import redis
 from datetime import timedelta
 from urllib.parse import quote_plus
@@ -78,8 +77,9 @@ class AuthRegistrationView(generics.CreateAPIView):
                     args=[serializer.initial_data["email"], signature],
                 )
             else:
-                logger.warning("\n" +
-                    generate_email_from_template(
+                logger.warning(
+                    "\n"
+                    + generate_email_from_template(
                         recipient=serializer.initial_data["email"],
                         template="activation",
                         signature=signature,
@@ -160,8 +160,9 @@ class AuthResetAcivationView(generics.GenericAPIView):
                     args=[serializer.initial_data["email"], signature],
                 )
             else:
-                logger.warning("\n" +
-                    generate_email_from_template(
+                logger.warning(
+                    "\n"
+                    + generate_email_from_template(
                         recipient=serializer.initial_data["email"],
                         template="activation",
                         signature=signature,
@@ -206,8 +207,9 @@ class AuthResetPasswordView(generics.CreateAPIView):
                     args=[performer.initial_data["email"], signature],
                 )
             else:
-                logger.warning("\n" +
-                    generate_email_from_template(
+                logger.warning(
+                    "\n"
+                    + generate_email_from_template(
                         recipient=performer.initial_data["email"],
                         template="resetpassword",
                         signature=signature,
