@@ -43,7 +43,7 @@ This is an experimental project that I choose to learn more about frontend and b
 $ git clone https://github.com/jirenmaa/twitter-clone.git
 ```
 
-running the docker compose
+change and configure `.django.example` to `.django` and `.postgres.example` to `.postgres` in `.envs` folder, then running the docker compose
 
 ```sh
 $ docker-compose build && docker-compose up -d
