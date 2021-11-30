@@ -38,6 +38,7 @@ services:
       - ./.envs/.django
       - ./.envs/.postgres
     environment:
+      PYTHONUNBUFFERED: 1
       POSTGRES_DOCKER_HOST: service-database
       REDIS_HOST: worker-redis
       CELERY_BROKER_URL: redis://worker-redis:6379/0

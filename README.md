@@ -46,13 +46,7 @@ $ git clone https://github.com/jirenmaa/twitter-clone.git
 change and configure `.django.example` to `.django` and `.postgres.example` to `.postgres` in `.envs` folder, then running the docker compose
 
 ```sh
-$ docker-compose build && docker-compose up -d
-```
-
-If you are not configuring [email](https://github.com/jirenmaa/twitter-clone/blob/10fa3cd1f42d6be60de1dcb18f2805a9e99307a6/.envs/.django.example#L14), you must run the django console in container to receive emails for your user registration.
-
-```sh
-$ docker-compose run --rm service-backend
+$ docker-compose build && docker-compose up
 ```
 
 The site will be hosted on [http://localhost:8080](http://localhost:8080)
@@ -102,7 +96,6 @@ $ yarn website
 ```sh
 $ python3 manage.py runserver
 ```
-
 
 ## License
 
