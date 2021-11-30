@@ -33,7 +33,7 @@ services:
     volumes:
       - local_backend_data:/usr/src:z
     command:
-      - /usr/src/compose/backend/runserver
+      - /usr/src/compose/rest/runserver
     env_file:
       - ./.envs/.django
       - ./.envs/.postgres
