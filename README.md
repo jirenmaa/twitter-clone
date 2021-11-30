@@ -1,7 +1,9 @@
 <p>
   <h1>Twitter Clone</h1>
-  <p>Attempting to create a twitter clone project</p>
+  <p>An attempt to create a twitter clone website (for learning purpose)</p>
 </p>
+
+![preview](git-assets/preview.gif)
 
 ## Table Of Contents
 
@@ -18,8 +20,6 @@
 
 This is an experimental project that I choose to learn more about frontend and backend development and how they interact.
 
-![preview](git-assets/preview.gif)
-
 ## Built With
 
 |                       Django Rest Framework                        |                      Vue JS                       |                       Docker                        |
@@ -31,7 +31,7 @@ This is an experimental project that I choose to learn more about frontend and b
 - [x] Authentication
 - [x] User Profile (tweets, media, replies, liked tweets)
 - [x] Create Tweet
-- [ ] Delete Tweet
+- [x] Delete Tweet
 - [x] Like, Unlike Tweet
 - [x] Reply Tweet
 
@@ -49,11 +49,13 @@ running the docker compose
 $ docker-compose build && docker-compose up -d
 ```
 
-If you are not configuring email, you must run the django container to receive emails for your user registration.
+If you are not configuring [email](https://github.com/jirenmaa/twitter-clone/blob/10fa3cd1f42d6be60de1dcb18f2805a9e99307a6/.envs/.django.example#L14), you must run the django console in container to receive emails for your user registration.
 
 ```sh
 $ docker-compose run --rm service-backend
 ```
+
+The site will be hosted on [http://localhost:8080](http://localhost:8080)
 
 ### Running locally with git clone
 
