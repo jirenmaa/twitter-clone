@@ -5,7 +5,7 @@ from datetime import timedelta
 from urllib.parse import quote_plus
 
 from celeryapp.tasks import send_email_activation, send_email_resetpassword
-from celeryapp.workers.mailer import email_activation_link, email_resetpassword_link
+from celeryapp.workers.mailer import generate_email_from_template
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -24,6 +24,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 redis_client = redis.Redis(
     host=settings.REDIS_HOST,
@@ -74,7 +78,13 @@ class AuthRegistrationView(generics.CreateAPIView):
                     args=[serializer.initial_data["email"], signature],
                 )
             else:
-                email_activation_link(serializer.initial_data["email"], signature)
+                logger.warning("\n" +
+                    generate_email_from_template(
+                        recipient=serializer.initial_data["email"],
+                        template="activation",
+                        signature=signature,
+                    )
+                )
 
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
@@ -150,7 +160,13 @@ class AuthResetAcivationView(generics.GenericAPIView):
                     args=[serializer.initial_data["email"], signature],
                 )
             else:
-                email_activation_link(serializer.initial_data["email"], signature)
+                logger.warning("\n" +
+                    generate_email_from_template(
+                        recipient=serializer.initial_data["email"],
+                        template="activation",
+                        signature=signature,
+                    )
+                )
 
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
@@ -190,7 +206,13 @@ class AuthResetPasswordView(generics.CreateAPIView):
                     args=[performer.initial_data["email"], signature],
                 )
             else:
-                email_resetpassword_link(performer.initial_data["email"], signature)
+                logger.warning("\n" +
+                    generate_email_from_template(
+                        recipient=performer.initial_data["email"],
+                        template="resetpassword",
+                        signature=signature,
+                    )
+                )
 
             # set redis key with signature and user id
             # and will be deleted after activation or expiration
