@@ -51,6 +51,8 @@ $ docker-compose build && docker-compose up
 
 The site will be hosted on [http://localhost:8080](http://localhost:8080)
 
+NOTE: if email settings in `.django` env is not configure, you will recive email for user activation (register) from console when you running `docker-compose up`.
+
 ### Running locally with git clone
 
 Assume you have 'python', 'node', 'docker' (optional), and'redis' (for email queue) installed to run the project.
